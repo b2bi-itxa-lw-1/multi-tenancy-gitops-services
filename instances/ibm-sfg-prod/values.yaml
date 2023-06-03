@@ -103,6 +103,7 @@ appResourcesPVC:
 
 
 appLogsPVC:
+  name: logs
   storageClassName: ""
   selector:
     label: "intent"
@@ -136,9 +137,9 @@ extraPVCs: []
 
 security:
   supplementalGroups: [65534]
-  fsGroup:
+  fsGroup: 1010
   fsGroupChangePolicy: "OnRootMismatch"
-  runAsUser:
+  runAsUser: 1010
   runAsGroup: 
 ingress:
   enabled: true
@@ -160,6 +161,7 @@ dataSetup:
 
 env:
   tz: "UTC"
+  license: "accept"
   upgradeCompatibilityVerified: false
   debugMode: false
   extraEnvs: []
@@ -286,7 +288,8 @@ setupCfg:
   #Provide the admin email address
   adminEmailAddress: Raafat@ibm.com
   # Provide the SMTP host details  
-  terminationGracePeriod: us.ibm.com
+  terminationGracePeriod: 30
+  smtpHost: us.ibm.com
 
   #Provide the soft stop timeout. Only numeric value is accepted.
   softStopTimeout: 30
@@ -314,6 +317,7 @@ setupCfg:
   jmsCiphersuite:
   # Applicable for IBMMQ
   jmsProtocol: TLSv1.2
+  updateJcePolicyFile: false
   #Liberty Profile SSL Config
   libertyKeystoreLocation:
   libertyProtocol: TLSv1.2
@@ -350,9 +354,9 @@ setupCfg:
 asi:
   replicaCount: 1
   
-  # seasIntegration:
-  #   isEnabled: false
-  #   seasVersion: "1.0"
+  seasIntegration:
+    isEnabled: false
+    seasVersion: "1.0"
   
   env:
     jvmOptions:
