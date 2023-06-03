@@ -1,6 +1,6 @@
-# (C) Copyright 2019 Syncsort Incorporated. All rights reserved.
+# (C) Copyright 2019-2022 Syncsort Incorporated. All rights reserved.
 
-# Default values for sfg.
+# Default values for b2bi.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -77,7 +77,6 @@ arch:
   s390x: "2 - No Preference"
 
 serviceAccount:
-  create: false
   name: b2bi
 resourcesInit:
   enabled: true
@@ -91,43 +90,56 @@ resourcesInit:
 persistence:
   enabled: true
   useDynamicProvisioning: true
-  name: resources
+
 appResourcesPVC:
-  enabled: true
-  name: resources
+  enabled: false
   storageClassName: ""
   selector:
     label: "intent"
     value: "resources"
   accessMode: ReadOnlyMany
   size: 100Mi
-preDefinedResourcePVCName: 
+  preDefinedResourcePVCName: 
+
 
 appLogsPVC:
-  name: logs
   storageClassName: ""
   selector:
     label: "intent"
     value: "logs"
   accessMode: ReadWriteMany
   size: 500Mi
-  preDefinedLogsPVCName:   
+  preDefinedLogsPVCName: 
+  
 appDocumentsPVC:
   enabled: false
-  name: documents
   storageClassName: ""
   selector:
     label: "intent"
     value: "documents"
   accessMode: ReadWriteMany
   size: 500Mi
+  enableVolumeClaimPerPod: false
+  preDefinedDocumentPVCName: 
+
+extraPVCs: []
+  #- name:
+  #  storageClassName:
+  #  selector:
+  #    label:
+  #    value:
+  #  accessMode:
+  #  size:
+  #  mountPath:
+  #  enableVolumeClaimPerPod: false
+  #  predefinedPVCName:
 
 security:
-  supplementalGroups: [5555]
-  fsGroup: 1010
-  runAsUser: 1010
-
-
+  supplementalGroups: [65534]
+  fsGroup:
+  fsGroupChangePolicy: "OnRootMismatch"
+  runAsUser:
+  runAsGroup: 
 ingress:
   enabled: true
   controller: "nginx"
@@ -137,12 +149,32 @@ ingress:
 dataSetup:
   enabled: true
   upgrade: false
-
+  image:
+    repository: "cp.icr.io/cp/ibm-b2bi/b2bi-dbsetup"
+    # Provide the tag value in double quotes
+    tag: "6.1.2.2"
+     # If digest is specified, it takes precedence over tag
+    digest: sha256:ff279b7df12a22a1773753c8d03a1e32fb5ab8395b94c203dc3fa599e4184551
+    pullPolicy: IfNotPresent
+    pullSecret: ibm-entitlement-key
 
 env:
   tz: "UTC"
-  license: "accept"
   upgradeCompatibilityVerified: false
+  debugMode: false
+  extraEnvs: []
+    #- name: FOO
+    #  valueFrom:
+    #    secretKeyRef:
+    #      name: secret-name
+    #      key: FOO
+    #- name: BAR
+    #  valueFrom:
+    #    configMapKeyRef:
+    #      name: configmap-name
+    #      key: BAR
+    #- name: FOOBAR
+    #  value: foobar 
   
 logs:
 
@@ -151,8 +183,73 @@ logs:
       
   # In standalone kubernetes environment, if PodSecurityPolicy is enabled and no default PSPs are present then change the value below to true.      
 applyPolicyToKubeSystem: false
+integrations:
+  seasIntegration:
+    isEnabled: false
+    seasVersion: "1.0"
+  itxIntegration:
+    enabled: true
+    dataSetup:
+      enabled: true
+    image:
+      repository: "cp.icr.io/cp/ibm-itx-rs"
+      tag: "10.1.1.1.20221116"
+      digest: "sha256:d6dea7cad255582d091f91c7ab226d819ce105a4146b9ac706d96262dd929afc"
+      pullPolicy: IfNotPresent
+      pullSecret:
+    dataPVC:
+      name: itxdata
+      useDynamicProvisioning: true  
+      storageClassName: ""
+      selector:
+        label: "intent"
+        value: "itxdata"
+      accessMode: ReadWriteMany
+      size: 100Mi
+      preDefinedDataPVCName:
+    logsPVC:
+      name: itxlogs
+      useDynamicProvisioning: true
+      storageClassName: ""
+      selector:
+        label: "intent"
+        value: "itxlogs"
+      accessMode: ReadWriteMany
+      size: 100Mi
+      preDefinedLogsPVCName:
+    # Logging settings
+    log:
+      includeHostInLogNames: true
+      jniLog:
+        # Supported levels are "none", "failures", "info" and "all". Default is "none".
+        level: "none"
+      cmgrLog:
+        # Supported levels are "none", "failures", "info" and "all". Default is "none".
+        level: "none"
+  itxaIntegration:
+    enabled: false
+    dataSetup:
+      enabled: true
+    image:
+      repository: "cp.icr.io/cp/ibm-itx-rs"
+      tag: "10.1.1.1.20221116"
+      digest: "sha256:d6dea7cad255582d091f91c7ab226d819ce105a4146b9ac706d96262dd929afc"
+      pullPolicy: IfNotPresent
+      pullSecret: "ibm-er-secret"
+    appSecret: "itxa-oracle-secrets"
+    secureDBConnection:
+      enabled: false
+      dbservercertsecretname: ""
+    persistence:
+      claims:
+        name: itxa-nfs-claim
+    sso:
+      host: "speui.apps.openshift.in.syncsort.dev"
+      port: "443"
+      ssl:
+        enabled: true
 
-  #setup.cfg configuration starts here. Property names must follow camelCase format.
+#setup.cfg configuration starts here. Property names must follow camelCase format.
 setupCfg:
   #Upgrade
   #upgrade: false
@@ -164,7 +261,7 @@ setupCfg:
   licenseAcceptEnableFileOperation: false
 
   # Name of system passphrase secret if available
-  systemPassphraseSecret: 
+  systemPassphraseSecret: b2bi-system-passphrase-secret
   #FIPS compliance mode. specify values as true/false 
   enableFipsMode: false
   # NIST 800-131a compliance mode. Please enter one of these values - strict/transition/"off"

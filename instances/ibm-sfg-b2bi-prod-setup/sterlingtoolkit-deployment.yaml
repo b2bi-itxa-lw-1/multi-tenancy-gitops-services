@@ -18,17 +18,12 @@ spec:
       - name: sterlingtoolkit
         image: quay.io/hollisc/sterlingtoolkit:1.0.6
         command: ["/bin/bash", "-ce", "cp /temp/db2jcc4.jar /var/nfs-data/resources/ && tail -f /dev/null"]
+        securityContext:
+          runAsUser: 0
         volumeMounts:
         - mountPath: /var/nfs-data/resources
           name: volume
-          subPath: resources
-        - mountPath: /var/nfs-data/documents
-          name: volume
-          subPath: documents
-        - mountPath: /var/nfs-data/logs
-          name: volume
-          subPath: logs
       volumes:
       - name: volume
         persistentVolumeClaim:
-          claimName: sterlingb2bitoolkit-pvc
+          claimName: ibm-sfg-b2bi-prod-sfg-resources
