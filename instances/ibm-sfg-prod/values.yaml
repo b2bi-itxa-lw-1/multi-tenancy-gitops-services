@@ -93,6 +93,7 @@ persistence:
 
 appResourcesPVC:
   enabled: false
+  name: resources
   storageClassName: "managed-nfs-storage"
   selector:
     label: "intent"
@@ -113,6 +114,7 @@ appLogsPVC:
   preDefinedLogsPVCName: 
   
 appDocumentsPVC:
+  name: documents
   enabled: false
   storageClassName: ""
   selector:
