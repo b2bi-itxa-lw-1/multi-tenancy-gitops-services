@@ -21,7 +21,7 @@ global:
 
   networkPolicies:
     ingress:
-      enabled: false
+      enabled: true
       customPolicies:
       #- name:
       #  fromSelectors:
@@ -44,7 +44,7 @@ global:
       #     endPort: 8450  
       
     egress:
-      enabled: false
+      enabled: true
       customPolicies:
       #- name:
       #  toSelectors:
@@ -77,7 +77,7 @@ arch:
   s390x: "2 - No Preference"
 
 serviceAccount:
-  name: b2bi
+  name: default
 resourcesInit:
   enabled: true
   image:
@@ -104,8 +104,7 @@ appResourcesPVC:
 
 
 appLogsPVC:
-  name: logs
-  storageClassName: ""
+  storageClassName: "managed-nfs-storage"
   selector:
     label: "intent"
     value: "logs"
@@ -114,9 +113,8 @@ appLogsPVC:
   preDefinedLogsPVCName: 
   
 appDocumentsPVC:
-  name: documents
   enabled: false
-  storageClassName: ""
+  storageClassName: "managed-nfs-storage"
   selector:
     label: "intent"
     value: "documents"
@@ -139,9 +137,9 @@ extraPVCs: []
 
 security:
   supplementalGroups: [65534]
-  fsGroup: 1010
+  fsGroup: 
   fsGroupChangePolicy: "OnRootMismatch"
-  runAsUser: 1010
+  runAsUser: 
   runAsGroup: 
 ingress:
   enabled: true
@@ -163,7 +161,7 @@ dataSetup:
 
 env:
   tz: "UTC"
-  license: "accept"
+  # license: "accept"
   upgradeCompatibilityVerified: false
   debugMode: false
   extraEnvs: []
@@ -191,67 +189,67 @@ integrations:
   seasIntegration:
     isEnabled: false
     seasVersion: "1.0"
-  itxIntegration:
-    enabled: true
-    dataSetup:
-      enabled: true
-    image:
-      repository: "cp.icr.io/cp/ibm-itx-rs"
-      tag: "10.1.1.1.20221116"
-      digest: "sha256:d6dea7cad255582d091f91c7ab226d819ce105a4146b9ac706d96262dd929afc"
-      pullPolicy: IfNotPresent
-      pullSecret:
-    dataPVC:
-      name: itxdata
-      useDynamicProvisioning: true  
-      storageClassName: ""
-      selector:
-        label: "intent"
-        value: "itxdata"
-      accessMode: ReadWriteMany
-      size: 100Mi
-      preDefinedDataPVCName:
-    logsPVC:
-      name: itxlogs
-      useDynamicProvisioning: true
-      storageClassName: ""
-      selector:
-        label: "intent"
-        value: "itxlogs"
-      accessMode: ReadWriteMany
-      size: 100Mi
-      preDefinedLogsPVCName:
-    # Logging settings
-    log:
-      includeHostInLogNames: true
-      jniLog:
-        # Supported levels are "none", "failures", "info" and "all". Default is "none".
-        level: "none"
-      cmgrLog:
-        # Supported levels are "none", "failures", "info" and "all". Default is "none".
-        level: "none"
-  itxaIntegration:
-    enabled: false
-    dataSetup:
-      enabled: true
-    image:
-      repository: "cp.icr.io/cp/ibm-itx-rs"
-      tag: "10.1.1.1.20221116"
-      digest: "sha256:d6dea7cad255582d091f91c7ab226d819ce105a4146b9ac706d96262dd929afc"
-      pullPolicy: IfNotPresent
-      pullSecret: "ibm-er-secret"
-    appSecret: "itxa-oracle-secrets"
-    secureDBConnection:
-      enabled: false
-      dbservercertsecretname: ""
-    persistence:
-      claims:
-        name: itxa-nfs-claim
-    sso:
-      host: "speui.apps.openshift.in.syncsort.dev"
-      port: "443"
-      ssl:
-        enabled: true
+  # itxIntegration:
+  #   enabled: true
+  #   dataSetup:
+  #     enabled: true
+  #   image:
+  #     repository: "cp.icr.io/cp/ibm-itx-rs"
+  #     tag: "10.1.1.1.20221116"
+  #     digest: "sha256:d6dea7cad255582d091f91c7ab226d819ce105a4146b9ac706d96262dd929afc"
+  #     pullPolicy: IfNotPresent
+  #     pullSecret:
+  #   dataPVC:
+  #     name: itxdata
+  #     useDynamicProvisioning: true  
+  #     storageClassName: ""
+  #     selector:
+  #       label: "intent"
+  #       value: "itxdata"
+  #     accessMode: ReadWriteMany
+  #     size: 100Mi
+  #     preDefinedDataPVCName:
+  #   logsPVC:
+  #     name: itxlogs
+  #     useDynamicProvisioning: true
+  #     storageClassName: ""
+  #     selector:
+  #       label: "intent"
+  #       value: "itxlogs"
+  #     accessMode: ReadWriteMany
+  #     size: 100Mi
+  #     preDefinedLogsPVCName:
+  #   # Logging settings
+  #   log:
+  #     includeHostInLogNames: true
+  #     jniLog:
+  #       # Supported levels are "none", "failures", "info" and "all". Default is "none".
+  #       level: "none"
+  #     cmgrLog:
+  #       # Supported levels are "none", "failures", "info" and "all". Default is "none".
+  #       level: "none"
+  # itxaIntegration:
+  #   enabled: false
+  #   dataSetup:
+  #     enabled: true
+  #   image:
+  #     repository: "cp.icr.io/cp/ibm-itx-rs"
+  #     tag: "10.1.1.1.20221116"
+  #     digest: "sha256:d6dea7cad255582d091f91c7ab226d819ce105a4146b9ac706d96262dd929afc"
+  #     pullPolicy: IfNotPresent
+  #     pullSecret: "ibm-er-secret"
+  #   appSecret: "itxa-oracle-secrets"
+  #   secureDBConnection:
+  #     enabled: false
+  #     dbservercertsecretname: ""
+  #   persistence:
+  #     claims:
+  #       name: itxa-nfs-claim
+  #   sso:
+  #     host: "speui.apps.openshift.in.syncsort.dev"
+  #     port: "443"
+  #     ssl:
+  #       enabled: true
 
 #setup.cfg configuration starts here. Property names must follow camelCase format.
 setupCfg:
@@ -259,14 +257,14 @@ setupCfg:
   #upgrade: false
   basePort: 50000
   #License - specify values as true/false
-  licenseAcceptEnableSfg: false
+  licenseAcceptEnableSfg: true
   licenseAcceptEnableEbics: false
   licenseAcceptEnableFinancialServices: false
   licenseAcceptEnableFileOperation: false
 
   # Name of system passphrase secret if available
   systemPassphraseSecret: b2b-system-passphrase-secret
-  #FIPS compliance mode. specify values as true/false 
+  #FIPS compliance mode. specifyhi values as true/false 
   enableFipsMode: false
   # NIST 800-131a compliance mode. Please enter one of these values - strict/transition/"off"
   nistComplianceMode: "off"
@@ -291,7 +289,7 @@ setupCfg:
   adminEmailAddress: Raafat@ibm.com
   # Provide the SMTP host details  
   terminationGracePeriod: 30
-  smtpHost: us.ibm.com
+  smtpHost: localhost
 
   #Provide the soft stop timeout. Only numeric value is accepted.
   softStopTimeout: 30
@@ -339,7 +337,7 @@ setupCfg:
   restartCluster: false
 
   # Enable SSL over RMI calls
-  useSslForRmi: true
+  useSslForRmi: false
 
   # Name of the RMI Secret if available.
   rmiTlsSecretName:
@@ -434,24 +432,24 @@ asi:
         targetPort: 30201
         nodePort: 30201
         protocol: TCP
-    portRanges: []
-      #- name: adapters
-      #  portRange: 30301-30400
-      #  targetPortRange: 30301-30400
-      #  nodePortRange: 30301-30400
-      #  protocol: TCP
+    portRanges: 
+      - name: adapters
+        portRange: 30301-30400
+        targetPortRange: 30301-30400
+        nodePortRange: 30301-30400
+        protocol: TCP
     loadBalancerIP:  
     annotations: {}
       
   livenessProbe:
-    initialDelaySeconds: 60
+    initialDelaySeconds: 600
     timeoutSeconds: 30
     periodSeconds: 60
 
   # command - command to be executed 
   # arg1, arg2.. - command arguments
   readinessProbe:
-    initialDelaySeconds: 60
+    initialDelaySeconds: 600
     timeoutSeconds: 5
     periodSeconds: 60
     command:
@@ -460,10 +458,10 @@ asi:
       #- arg2
      
   startupProbe:
-    initialDelaySeconds: 300
+    initialDelaySeconds: 600
     timeoutSeconds: 30
     periodSeconds: 60
-    failureThreshold: 5
+    failureThreshold: 3
        
   internalAccess:
     enableHttps: true
@@ -477,19 +475,19 @@ asi:
     
   ingress:
     internal:
-      host: "b2bi62test.com"
+      host: asi-b2bi-prod-itzroks-6620022xah-laxo8w-6ccd7f378ae819553d37d5f2ee142bd6-0000.us-south.containers.appdomain.cloud
       tls:
-        enabled: true
-        secretName: ""
+        enabled: false
+        secretName:
       extraPaths: []
       #  - routePrefix: "hello"
       #    path: "/hello"
       #    servicePort: "my-http"
       #    enableHttps: false
     external:
-      host: itzroks-6620022xah-laxo8w-6ccd7f378ae819553d37d5f2ee142bd6-0000.us-south.containers.appdomain.cloud
+      host: ""
       tls:
-        enabled: true
+        enabled: false
         secretName: ""
       extraPaths: []
       #  - routePrefix: "hello"
@@ -717,12 +715,12 @@ ac:
         targetPort: 30401
         nodePort: 30401
         protocol: TCP
-    portRanges: []
-      #- name: adapters
-      #  portRange: 30501-30600
-      #  targetPortRange: 30501-30600
-      #  nodePortRange: 30501-30600
-      #  protocol: TCP
+    portRanges:
+      - name: adapters
+        portRange: 30501-30600
+        targetPortRange: 30501-30600
+        nodePortRange: 30501-30600
+        protocol: TCP
     loadBalancerIP:  
     annotations: {} 
 
@@ -741,12 +739,12 @@ ac:
       #- arg2
 
   internalAccess:
-    enableHttps: true
+    enableHttps: false
     tlsSecretName:
       
   ingress:
     internal:
-      host: "b2bi62test.com"
+      host: ac-b2bi-prod-itzroks-6620022xah-laxo8w-6ccd7f378ae819553d37d5f2ee142bd6-0000.us-south.containers.appdomain.cloud
       tls:
         enabled: true
         secretName: ""
@@ -756,9 +754,9 @@ ac:
       #    servicePort: "my-http"
       #    enableHttps: false
     external:
-      host: "us-south.containers.appdomain.cloud"
+      host: ""
       tls:
-        enabled: true
+        enabled: false
         secretName: ""
       extraPaths: []
       #  - routePrefix: "hello"
@@ -794,9 +792,11 @@ ac:
     limits:
       cpu: 4000m
       memory: 8Gi
+      ephemeral-storage: "4Gi"
     requests:
       cpu: 2000m
       memory: 4Gi
+      ephemeral-storage: "2Gi"
 
   autoscaling:
     enabled: false
@@ -978,7 +978,7 @@ api:
       #- arg2
       
   internalAccess:
-    enableHttps: true
+    enableHttps: false
     tlsSecretName:
 
   externalAccess:
@@ -988,7 +988,7 @@ api:
 
   ingress:
     internal:
-      host: "b2bi62test.com"
+      host: api-b2bi-prod-itzroks-6620022xah-laxo8w-6ccd7f378ae819553d37d5f2ee142bd6-0000.us-south.containers.appdomain.cloud
       tls:
         enabled: true
         secretName: ""
@@ -1177,9 +1177,9 @@ purge:
     #Refer to global env.extraEnvs for sample values
     extraEnvs: []
   
-  internalAccess:
-    enableHttps: true
-    tlsSecretName: 
+  # internalAccess:
+  #   enableHttps: true
+  #   tlsSecretName: 
 
   resources: 
     # We usually recommend not to specify default resources and to leave this as a conscious
@@ -1198,18 +1198,18 @@ purge:
     requiredDuringSchedulingIgnoredDuringExecution: []
     preferredDuringSchedulingIgnoredDuringExecution: []
 
-documentService:
-  enabled: false
-  sslEnabled: true
-  readBufferSize: 32768
-  connectionPoolConfig:
-    maxTotalConnections: 250
-    maxConnectionsPerRoute: 100
-    connectTimeout: 10000
-    readTimeout: 60000
-    idleTimeout: 60000
-    idleMonitorThread: true
-    waitTimeout: 30000
-    keepAlive: 300000
-    retryCount: 2
-    disableContentCompression: true
+# documentService:
+#   enabled: false
+#   sslEnabled: true
+#   readBufferSize: 32768
+#   connectionPoolConfig:
+#     maxTotalConnections: 250
+#     maxConnectionsPerRoute: 100
+#     connectTimeout: 10000
+#     readTimeout: 60000
+#     idleTimeout: 60000
+#     idleMonitorThread: true
+#     waitTimeout: 30000
+#     keepAlive: 300000
+#     retryCount: 2
+#     disableContentCompression: true
