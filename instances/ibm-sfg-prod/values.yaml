@@ -15,7 +15,7 @@ global:
   image:
     repository: "cp.icr.io/cp/ibm-sfg/sfg"
   # Provide the tag value in double quotes
-    tag: "6.1.2.2"
+    tag: "6.1.2.0"
     pullPolicy: IfNotPresent
     pullSecret: "ibm-entitlement-key"
 
@@ -79,7 +79,7 @@ arch:
 serviceAccount:
   name: default
 resourcesInit:
-  enabled: true
+  enabled: false
   image:
     repository: "cp.icr.io/cp/ibm-b2bi"
     name: "b2bi-resources"
@@ -143,7 +143,7 @@ security:
   runAsUser: 1010
   runAsGroup: 
 ingress:
-  enabled: true
+  enabled: false
   controller: "nginx"
   annotations: {}
   port:
@@ -740,7 +740,7 @@ ac:
       #- arg2
 
   internalAccess:
-    enableHttps: false
+    enableHttps: true
     tlsSecretName:
       
   ingress:
@@ -1161,7 +1161,7 @@ purge:
   image:
     repository: "cp.icr.io/cp/ibm-b2bi/b2bi-purge"
   # Provide the tag value in double quotes
-    tag: "6.1.2.2"
+    tag: "6.1.2.0"
     digest: sha256:82af150873315122c804ec06ea356f7db186732f73ec00338076746202d84d25
     pullPolicy: IfNotPresent
     pullSecret: "ibm-er-secret"
