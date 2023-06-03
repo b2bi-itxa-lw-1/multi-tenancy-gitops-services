@@ -106,6 +106,7 @@ appResourcesPVC:
 
 
 appLogsPVC:
+  name: logs
   storageClassName: "managed-nfs-storage"
   selector:
     label: "intent"
@@ -139,9 +140,9 @@ extraPVCs: []
 
 security:
   supplementalGroups: [65534]
-  fsGroup: 
+  fsGroup: 1010
   fsGroupChangePolicy: "OnRootMismatch"
-  runAsUser: 
+  runAsUser: 1010
   runAsGroup: 
 ingress:
   enabled: true
@@ -163,7 +164,7 @@ dataSetup:
 
 env:
   tz: "UTC"
-  # license: "accept"
+  license: "accept"
   upgradeCompatibilityVerified: false
   debugMode: false
   extraEnvs: []
@@ -356,9 +357,9 @@ setupCfg:
 asi:
   replicaCount: 1
   
-  # seasIntegration:
-  #   isEnabled: false
-  #   seasVersion: "1.0"
+  seasIntegration:
+    isEnabled: false
+    seasVersion: "1.0"
   
   env:
     jvmOptions:
