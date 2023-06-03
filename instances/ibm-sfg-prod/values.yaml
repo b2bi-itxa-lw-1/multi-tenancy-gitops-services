@@ -13,11 +13,13 @@ global:
   # Non-production respectively. Remember that this parameter is crucial for IBM Licensing and Metering Service
   licenseType: "prod"
   image:
-    repository: "cp.icr.io/cp/ibm-sfg/sfg"
+    repository: "cp.icr.io/cp/ibm-b2bi/b2bi"
   # Provide the tag value in double quotes
-    tag: "6.1.2.0"
+    tag: "6.1.2.2"
+  # If digest is specified, it takes precedence over tag
+    digest: sha256:4199ccb92349366fa5debbc7d4bccff9e56edaf0b22fa473e2040baedaa0acc8
     pullPolicy: IfNotPresent
-    pullSecret: "ibm-entitlement-key"
+    pullSecret: ibm-entitlement-key
 
   networkPolicies:
     ingress:
@@ -77,9 +79,9 @@ arch:
   s390x: "2 - No Preference"
 
 serviceAccount:
-  name: default
+  name: b2bi
 resourcesInit:
-  enabled: false
+  enabled: true
   image:
     repository: "cp.icr.io/cp/ibm-b2bi"
     name: "b2bi-resources"
@@ -104,7 +106,6 @@ appResourcesPVC:
 
 
 appLogsPVC:
-  name: logs
   storageClassName: "managed-nfs-storage"
   selector:
     label: "intent"
@@ -138,12 +139,12 @@ extraPVCs: []
 
 security:
   supplementalGroups: [65534]
-  fsGroup: 1010
+  fsGroup: 
   fsGroupChangePolicy: "OnRootMismatch"
-  runAsUser: 1010
+  runAsUser: 
   runAsGroup: 
 ingress:
-  enabled: false
+  enabled: true
   controller: "nginx"
   annotations: {}
   port:
@@ -162,7 +163,7 @@ dataSetup:
 
 env:
   tz: "UTC"
-  license: "accept"
+  # license: "accept"
   upgradeCompatibilityVerified: false
   debugMode: false
   extraEnvs: []
@@ -258,14 +259,14 @@ setupCfg:
   #upgrade: false
   basePort: 50000
   #License - specify values as true/false
-  licenseAcceptEnableSfg: true
+  licenseAcceptEnableSfg: false
   licenseAcceptEnableEbics: false
   licenseAcceptEnableFinancialServices: false
   licenseAcceptEnableFileOperation: false
 
   # Name of system passphrase secret if available
   systemPassphraseSecret: b2b-system-passphrase-secret
-  #FIPS compliance mode. specifyhi values as true/false 
+  #FIPS compliance mode. specify values as true/false 
   enableFipsMode: false
   # NIST 800-131a compliance mode. Please enter one of these values - strict/transition/"off"
   nistComplianceMode: "off"
@@ -289,11 +290,11 @@ setupCfg:
   #Provide the admin email address
   adminEmailAddress: Raafat@ibm.com
   # Provide the SMTP host details  
-  terminationGracePeriod: 30
+
   smtpHost: localhost
 
   #Provide the soft stop timeout. Only numeric value is accepted.
-  softStopTimeout: 30
+  terminationGracePeriod: 30
 
   #WMQ
   #JMS properties are optional if jmsVendor is empty
@@ -338,7 +339,7 @@ setupCfg:
   restartCluster: false
 
   # Enable SSL over RMI calls
-  useSslForRmi: false
+  useSslForRmi: true
 
   # Name of the RMI Secret if available.
   rmiTlsSecretName:
@@ -355,9 +356,9 @@ setupCfg:
 asi:
   replicaCount: 1
   
-  seasIntegration:
-    isEnabled: false
-    seasVersion: "1.0"
+  # seasIntegration:
+  #   isEnabled: false
+  #   seasVersion: "1.0"
   
   env:
     jvmOptions:
@@ -415,7 +416,7 @@ asi:
     loadBalancerIP:  
     annotations: {}    
   backendService:
-    type: LoadBalancer
+    type: NodePort
     # Supported values are "ClientIP" & "None". Default is "None".
     sessionAffinity: None
     #override session affinity timeout configuration (applicable when sessionAffinity is configured other than "None")
@@ -478,7 +479,7 @@ asi:
     internal:
       host: asi-b2bi-prod-itzroks-6620022xah-laxo8w-6ccd7f378ae819553d37d5f2ee142bd6-0000.us-south.containers.appdomain.cloud
       tls:
-        enabled: false
+        enabled: true
         secretName:
       extraPaths: []
       #  - routePrefix: "hello"
@@ -488,7 +489,7 @@ asi:
     external:
       host: ""
       tls:
-        enabled: false
+        enabled: true
         secretName: ""
       extraPaths: []
       #  - routePrefix: "hello"
@@ -698,7 +699,7 @@ ac:
     loadBalancerIP:  
     annotations: {}  
   backendService:
-    type: LoadBalancer
+    type: NodePort
     # Supported values are "ClientIP" & "None". Default is "None".
     sessionAffinity: None
     #override session affinity timeout configuration (applicable when sessionAffinity is configured other than "None")
@@ -757,7 +758,7 @@ ac:
     external:
       host: ""
       tls:
-        enabled: false
+        enabled: true
         secretName: ""
       extraPaths: []
       #  - routePrefix: "hello"
@@ -979,7 +980,7 @@ api:
       #- arg2
       
   internalAccess:
-    enableHttps: false
+    enableHttps: true
     tlsSecretName:
 
   externalAccess:
@@ -1161,10 +1162,10 @@ purge:
   image:
     repository: "cp.icr.io/cp/ibm-b2bi/b2bi-purge"
   # Provide the tag value in double quotes
-    tag: "6.1.2.0"
+    tag: "6.1.2.2"
     digest: sha256:82af150873315122c804ec06ea356f7db186732f73ec00338076746202d84d25
     pullPolicy: IfNotPresent
-    pullSecret: "ibm-er-secret"
+    pullSecret: ibm-entitlement-key
   # Provide a schedule for the purge job as a cron expression. For example "0 0 * * *" will run the purge job at 00:00 every day
   schedule:
   startingDeadlineSeconds: 60
