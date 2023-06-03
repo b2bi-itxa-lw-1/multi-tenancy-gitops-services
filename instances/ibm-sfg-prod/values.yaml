@@ -265,7 +265,7 @@ setupCfg:
   licenseAcceptEnableFileOperation: false
 
   # Name of system passphrase secret if available
-  systemPassphraseSecret: b2bi-system-passphrase-secret
+  systemPassphraseSecret: b2bi-passphrase-secret
   #FIPS compliance mode. specify values as true/false 
   enableFipsMode: false
   # NIST 800-131a compliance mode. Please enter one of these values - strict/transition/"off"
